@@ -1,0 +1,36 @@
+<nav>
+    {% if user.is_authenticated %}
+    <ul>
+        <l1>
+            {{ user.username }}
+        </li>
+        <li>
+            <a href="{% url 'logout' %}">
+            <button type="button">Logout</button>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'create_game' %}">
+                <button type="button">New Game</button>
+            </a>
+        </li>
+        <li>
+            <form method="post" action="{% url 'join_game' %}">
+                {% csrf_token %}
+                <button type="submit">Load Game</button>
+                <input type="text" name="game_id" placeholder="Game ID">
+            </form>
+        </li>
+    </ul>
+    {% else %}
+    <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+        <ul>
+            <li><input type="text" name="username" placeholder="Username"></li>
+            <li><input type="password" name="password" placeholder="Password"></li>
+            <li><button type="submit">Login</button></li>
+            <li><a href="{% url 'register' %}"><button type="button">Register</button></a></li>
+        </ul>
+    </form>
+    {% endif %}
+</nav>

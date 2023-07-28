@@ -1,0 +1,55 @@
+# establish two docker services, one for python 3.10-alpine,and one for postgres 13-alpine
+version: '3.9'
+services:
+  web:
+    # platform: linux/amd64
+    build:
+      context: .
+      # network: host
+    volumes:
+      - .:/code
+    ports:
+      - 8001:8000
+    environment:
+      SECRET_KEY: django-insecure-v%5coq=!s2(_tbfev*r7!ws#hw-u%uke731ezci7+%8d-)5io#
+      POSTGRES_PASSWORD: asdf1234
+      POSTGRES_USER: admin
+      POSTGRES_DB: tricks
+      POSTGRES_HOST: db
+      DATABASE_TYPE: development
+    stdin_open: true
+    tty: true
+    networks:
+      - tricks_net
+    depends_on:
+      - db
+  db:
+    # platform: linux/amd64
+    image: postgres:14.7
+    environment:
+      POSTGRES_PASSWORD: asdf1234
+      POSTGRES_USER: admin
+      POSTGRES_DB: tricks
+    ports:
+      - 5433:5432
+    restart: always
+    networks:
+      - tricks_net
+    volumes:
+      - tricks_vol:/var/lib/postgresql/data
+  adminer:
+    # platform: linux/amd64
+    image: adminer
+    restart: always
+    ports:
+      - 8081:8080
+    networks:
+      - tricks_net
+    depends_on:
+      - db
+
+volumes:
+  tricks_vol:
+
+networks:
+  tricks_net:

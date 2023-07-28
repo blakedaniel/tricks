@@ -1,0 +1,8 @@
+<form>
+    <ul>
+        {% for bet in bets %}
+        <input type="hidden" name="bet" value="{{ bet }}">
+        <li><input type="submit" hx-boost="true" value="{{ bet }}"></li>
+        {% endfor %}
+    </ul>
+</form>

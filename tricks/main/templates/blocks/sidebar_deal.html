@@ -1,0 +1,4 @@
+<form method="get" action="{% url 'deal' game_id=game_id%}" hx-boost="true" hx-target="#updated_sidebar">
+    <input type="hidden" name="game_id" value="{{ game_id }}">
+    <button type="submit" name="deal" value="deal">Deal</button>
+</form>
