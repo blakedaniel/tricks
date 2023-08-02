@@ -3,7 +3,7 @@
 <div class="sidebar">
     <div class="sidebar-item">
         <h3>Game</h3>
-        <p>{{game_id}}</p>
+        <p>{{game.id}}</p>
     </div>
     <div class="sidebar-item">
         <h3>Round {{cur_round}}</h3>
@@ -16,5 +16,7 @@
     </div>
 </div>
 <div id="updated_sidebar" class="sidebar"></div>
+{% include 'blocks/game_pile.html' %}
+{% include 'blocks/game_hand.html' %}
 {% endblock main %}
 

@@ -1,13 +1,19 @@
-<div class="bets">
-    <div class="bets-item" hx-trigger="every 2s">
-        <h3>Current Bets</h3>
-        <p>~~Betting Player: {{betting_player.user}}</p> <!--delete after dev-->
-        <p>~~Current User: {{request.user}}</p> <!--delete after dev-->
-        <p>~~Players: {{players}}</p> <!--delete after dev-->
-        {% for player in players %}
-            <div>{{player.user.username}}: {{player.bet}}</div>
-            <div id="bet_form"></div>
-            <div hx-get="{% url 'bet_form' game_id=game_id %}" hx-trigger="every 2s" hx-target="#bet_form"></div>
-        {% endfor %}
-    </div>
+<div class="bets-item">
+    <h3>Current Bets</h3>
+    <p>~~Betting Player: {{betting_player.user}}</p> <!--delete after dev-->
+    <p>~~Current User: {{request.user}}</p> <!--delete after dev-->
+    <p>~~Players: {{players}}</p> <!--delete after dev-->
+    {% for player in players %}
+        <div>{{player.user.username}}: {{player.bet}}</div>
+        {% if player.user == betting_player.user %}
+        <form action="{% url 'bets' %}">
+            <ul>
+                {% for bet in bets %}
+                <input type="hidden" name="bet" value="{{ bet }}">
+                <li><input type="submit" hx-boost="true" value="{{ bet }}"></li>
+                {% endfor %}
+            </ul>
+        </form>
+        {% endif %}
+    {% endfor %}
 </div>

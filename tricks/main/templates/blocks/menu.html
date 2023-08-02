@@ -10,14 +10,21 @@
             </a>
         </li>
         <li>
-            <a href="{% url 'create_game' %}">
-                <button type="button">New Game</button>
-            </a>
+            <form method="get" action="{% url 'create_game' %}">
+                <button type="submit">New Game</button>
+            </form>
         </li>
+        {% if player %}
+        <li>
+            <form method="get" action="{% url 'game' game_id=game.id %}">
+                <button type="submit">Current Game</button>
+            </form>
+        </li>
+        {% endif %}
         <li>
             <form method="post" action="{% url 'join_game' %}">
                 {% csrf_token %}
-                <button type="submit">Load Game</button>
+                <button type="submit">Join Game</button>
                 <input type="text" name="game_id" placeholder="Game ID">
             </form>
         </li>

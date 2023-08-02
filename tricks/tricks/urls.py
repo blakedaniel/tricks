@@ -15,18 +15,24 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.contrib.auth.views import LoginView, LogoutView
-from main.views import (CreateGame, JoinGame, home, MainGame, register,)
+# function based views
+from main.views import (home, register)
+# class based views
+from main.views import (CreateGame, JoinGame, Deal, CurGame)
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("login/", LoginView.as_view(template_name='registration/login.html'),
-         name="login"),
+    path("login/", LoginView.as_view(), name="login"),
     path("logout/", LogoutView.as_view(),
          name="logout"),
     path("register/", register, name="register"),
 ]
+
+# django debug toolbar
+urlpatterns += [path('__debug__/', include('debug_toolbar.urls')),]
 
 # game starting views
 urlpatterns += [path("", home, name="home"),
@@ -34,7 +40,9 @@ urlpatterns += [path("", home, name="home"),
                 path("join_game/", JoinGame.as_view(), name="join_game"),]
 
 # game playe views
-urlpatterns += [path("game/<int:game_id>/", MainGame.as_view(), name="game"),
-                path("game/<int:game_id>/deal", MainGame.as_view(), name="deal"),
-                path("game/<int:game_id>/bet", MainGame.as_view(), name="bet"),
-                path("game/<int:game_id>/bet_form", MainGame.as_view(), name="bet_form"),]
+urlpatterns += [path("game/<int:game_id>/", CurGame.as_view(), name="game"),
+                path("game/<int:game_id>/deal", Deal.as_view(), name="deal"),]
+
+# htmx_patterns = [path("game/<int:game_id>/player_bets", check_bets, name="player_bets"),]
+
+# urlpatterns += htmx_patterns

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from random import sample
 
 class Game(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -42,12 +43,47 @@ class Card(models.Model):
     rank = models.CharField(max_length=5, choices=RANK_CHOICES)
     player = models.ForeignKey(Player, on_delete=models.CASCADE, blank=True, null=True)
     status = models.TextField(blank=True, choices=[('d', 'Deck'), ('h', 'Hand'),
-                                                   ('p', 'Played'), ('t', 'Trump')],
+                                                   ('p', 'Played'), ('t', 'Trump'),
+                                                   ('i', 'In Play')],
                               default='d')
 
     def __str__(self):
         return f"{self.rank} of {self.suit}"
-
+    
+    @classmethod
+    def create_deck(cls, game:Game=None):
+        if game:
+            cls.objects.filter(game=game).delete()
+        
+        deck = []
+        for suit, _ in cls.SUIT_CHOICES:
+            for rank, _ in cls.RANK_CHOICES:
+                card = cls(suit=suit, rank=rank, game=game, status='d')
+                deck.append(card)
+        
+        cls.objects.bulk_create(deck)
+        return deck
+    
+    @classmethod
+    def random_cards(cls, game:Game, num):
+        deck = cls.objects.filter(game=game, status='d')
+        cards = sample(list(deck), num)
+        return cards
+    
+    @classmethod
+    def deal(cls, game:Game, players:Player, num:int):
+        for player in players:
+            cards = cls.random_cards(game, num)
+            for card in cards:
+                card.player = player
+                card.status = 'h'
+            Card.objects.bulk_update(cards, ['player', 'status'])
+        # set trump card
+        trump = cls.random_cards(game, 1)[0]
+        trump.status = 't'
+        trump.save()
+        return trump
+        
 class Round(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     cur_round = models.IntegerField(default=7)

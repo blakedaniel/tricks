@@ -31,6 +31,11 @@ ALLOWED_HOSTS = ['localhost',
                  '127.0.0.1',
                  '0.0.0.0']
 
+INTERNAL_IPS = [
+    '127.0.0.1',
+    '::1',
+]
+
 CSRF_TRUSTED_ORIGINS =['http://localhost*',]
 
 # Application definition
@@ -44,6 +49,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # Third-party apps
     "django_htmx",
+    'debug_toolbar',
     # Local apps
     "main"
 ]
@@ -58,6 +64,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     # Third-party middleware
     "django_htmx.middleware.HtmxMiddleware",
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = "tricks.urls"

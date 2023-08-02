@@ -1,7 +1,8 @@
 <div class="sidebar-item">
     <h3>Trump Card</h3>
-    <p>{{trump_card}}</p>
+    <p>{{trump}}</p>
 </div>
-{% include 'blocks/game_bets.html' %}
-{% include 'blocks/game_pile.html' %}
-{% include 'blocks/game_hand.html' %}
+<div class="sidebar-item">
+    <div id="player_bets"></div>
+   <div class="bets" hx-get="{% url player_bets %}" hx-trigger="every 2s" hx-target="#player_bets"></div>
+</div>
