@@ -1,22 +1,11 @@
 {% extends 'base.html' %}
 {% block main %}
-<div class="sidebar">
-    <div class="sidebar-item">
-        <h3>Game</h3>
-        <p>{{game.id}}</p>
-    </div>
-    <div class="sidebar-item">
-        <h3>Round {{cur_round}}</h3>
-        {% include 'blocks/sidebar_deal.html' %}
-        
-    </div>
-    <div class="sidebar-item">
-        <h3>Players</h3>
-        {% include 'blocks/sidebar_players.html' %}
-    </div>
+{% if %}
+<div> 
+    <h3>Current Pile</h3>
+    <div> pile goes here </div>
+    <h3>Current Hand</h3>
+    <div> hand goes here </div>
 </div>
-<div id="updated_sidebar" class="sidebar"></div>
-{% include 'blocks/game_pile.html' %}
-{% include 'blocks/game_hand.html' %}
 {% endblock main %}
 
