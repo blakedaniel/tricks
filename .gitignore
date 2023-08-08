@@ -1,0 +1,7 @@
+# python files
+*/__pycache__/
+
+# mac files
+.DS_Store
+
+# django files
