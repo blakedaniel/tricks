@@ -20,7 +20,7 @@ from django.contrib.auth.views import LoginView, LogoutView
 # function based views
 from main.views import (home, register)
 # class based views
-from main.views import (CreateGame, JoinGame, Deal, CurGame)
+from main.views import (CreateGame, JoinGame, CurGame, StartGame, Bet, PlayCard)
 
 
 urlpatterns = [
@@ -41,7 +41,9 @@ urlpatterns += [path("", home, name="home"),
 
 # game playe views
 urlpatterns += [path("game/<int:game_id>/", CurGame.as_view(), name="game"),
-                path("game/<int:game_id>/deal", Deal.as_view(), name="deal"),]
+                path("game/<int:game_id>/start_game", StartGame.as_view(), name="start_game"),
+                path("game/<int:game_id>/bet", Bet.as_view(), name="bet"),
+                path("game/<int:game_id>/play_card", PlayCard.as_view(), name="play_card")]
 
 # htmx_patterns = [path("game/<int:game_id>/player_bets", check_bets, name="player_bets"),]
 
