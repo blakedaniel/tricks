@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block main %}
+    <h1>End of Game</h1>
+    <h2>Winners</h2>
+    <ul>
+        {% for winner in winners %}
+            <li>{{ winner }}</li>
+        {% endfor %}
+    </ul>
+    <h2>Scores</h2>
+    <ul>
+        {% for player in players %}
+            <li>{{ player }}: {{ player.score }}</li>
+        {% endfor %}
+    </ul>
+    <form action="">
+        <input type="submit" value="Play Again">
+    </form>
+{% endblock main %}

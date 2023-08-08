@@ -1,19 +1,8 @@
-<div class="bets-item">
-    <h3>Current Bets</h3>
-    <p>~~Betting Player: {{betting_player.user}}</p> <!--delete after dev-->
-    <p>~~Current User: {{request.user}}</p> <!--delete after dev-->
-    <p>~~Players: {{players}}</p> <!--delete after dev-->
-    {% for player in players %}
-        <div>{{player.user.username}}: {{player.bet}}</div>
-        {% if player.user == betting_player.user %}
-        <form action="{% url 'bets' %}">
-            <ul>
-                {% for bet in bets %}
-                <input type="hidden" name="bet" value="{{ bet }}">
-                <li><input type="submit" hx-boost="true" value="{{ bet }}"></li>
-                {% endfor %}
-            </ul>
-        </form>
-        {% endif %}
+<ul>
+    {% for bet in bet_range %}
+    <form method="post" action="{% url 'bet' game_id=game.id %}">
+    {% csrf_token %}
+        <li><input type="submit" name="bet" hx-boost="true" value="{{ bet }}"></li>
+    </form>
     {% endfor %}
-</div>
+</ul>

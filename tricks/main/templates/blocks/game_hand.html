@@ -1,10 +1,15 @@
-<div class="cards">
-    <div class="cards-item">
-        <h3>Current Hand</h3>
-        <ul>
-            {% for card in hand %}
-            <li>{{card}}</li>
-            {% endfor %}
-        </ul>
-    </div>
-</div>
+{% if game.in_play and playing_player.user == request.user %}
+<ul>
+    {% for card in player.hand %}
+    <form method="post" action="{% url 'play_card' game_id=game.id %}">
+        {% csrf_token %}
+        <li><button type ="submit", name="play_card" value="{{ card.id }}">{{ card }}</button></li>
+    </form>
+    {% endfor %}
+</ul>
+{% else %}
+<ul>
+    {% for card in player.hand %}
+        <li>{{ card }}</li>
+    {% endfor %}
+{% endif %}

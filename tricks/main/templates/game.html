@@ -1,11 +1,23 @@
 {% extends 'base.html' %}
 {% block main %}
 {% include 'blocks/sidebar.html' %}
-<div> 
-    <h3>Current Pile</h3>
-    <div> pile goes here </div>
-    <h3>Current Hand</h3>
-    <div> hand goes here </div>
+<div class="table">
+    <div class="table-item">
+        <h3>Table</h3>
+        <ul>
+            {% for card in table %}
+            <li>{{card}}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="table-item">
+        <h3>Your Hand</h3>
+        <div class="cards">
+            <div class="cards-item">
+                {% include 'blocks/game_hand.html' %}
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock main %}
 
