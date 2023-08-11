@@ -28,7 +28,7 @@ def register(request):
 class CreateGame(View, LoginRequiredMixin):
     def get(self, request):
         player = Player.objects.create(user=request.user)
-        game = Game.objects.create(num_of_rounds=2)
+        game = Game.objects.create(num_of_rounds=1)
         game.players.add(player)
         request.session['game_details'] = {'player_id': player.id,
                                            'game_id': game.id,}
@@ -53,13 +53,14 @@ class JoinGame(View, LoginRequiredMixin):
         return HttpResponseRedirect(reverse('game', args=(game.id,)))
 
 class CurGame(View, LoginRequiredMixin):
-    def add_cur_rnd_to_context(self, game, context, cur_round, players, player):
+    def update_cur_round_data(self, game, context, cur_round, players, player):
             play_order = game.players.order_by('play_pos')
             remaining_plaing_players = game.players.filter(cur_card__isnull=True).order_by('play_pos')
             playing_player = remaining_plaing_players.first()
             bet_range = player.bet_range(cur_round)
             card_play_ready = cur_round.players.filter(bet__isnull=True).count() == 0
             playable_cards = player.playable_cards(cur_round)
+            last_round = game.rounds.last().num == 1
             context.update({
                 'cur_round': cur_round,
                 'playing_order': play_order,
@@ -71,9 +72,10 @@ class CurGame(View, LoginRequiredMixin):
                 'table': cur_round.table.all(),
                 'card_play_ready': card_play_ready,
                 'playable_cards': playable_cards,
+                'last_round': last_round,
                 })
             
-    def add_game_play_data_to_context(self, game, context, players, player):
+    def update_game_play_data(self, game, context, players, player):
         bet_order = game.players.order_by('bet_pos')
         remaining_betting_players = game.players.filter(bet__isnull=True).order_by('bet_pos')
         betting_player = remaining_betting_players.first()
@@ -104,10 +106,11 @@ class CurGame(View, LoginRequiredMixin):
         players = game.players.all().order_by('score')
         cur_round = game.cur_round
         if cur_round:
-            self.add_cur_rnd_to_context(game, context, cur_round, players, player)
-        self.add_game_play_data_to_context(game, context, players, player)
-        self.update_last_round_data(game, context, player)
-        if cur_round and cur_round.num == 1:
+            self.update_cur_round_data(game, context, cur_round, players, player)
+        
+        self.update_game_play_data(game, context, players, player)
+        
+        if 'last_round' in context and context['last_round']:
             self.update_last_round_data(game, context, player)
         return render(request, 'game.html', context)
     
@@ -145,11 +148,12 @@ class Bet(View):
 
 class PlayCard(View):
     def post(self, request, game_id):
+        game = Game.objects.get(id=game_id)
+        cur_round = game.cur_round
+        context = request.session['game_details']
+        player = Player.objects.get(id=context['player_id'])
+        
         if 'play_card' in request.POST:
-            context = request.session['game_details']
-            player = Player.objects.get(id=context['player_id'])
-            game = Game.objects.get(id=game_id)
-            cur_round = game.cur_round
             card_id = request.POST.get('play_card')
             card = Card.objects.get(id=card_id)
             player.play_card(card, cur_round)
@@ -158,15 +162,38 @@ class PlayCard(View):
                 if cur_round.num != 1 and game.check_round_complete():
                     game.end_round()
                     game.start_new_round()
-                elif cur_round.num == 1 and game.check_round_complete():
-                    game.end_round()
-                    winners = game.end_game()
-                    players = game.players.all().order_by('score')
-                    return render(request, 'end_game.html',
-                                  {'winners': winners,
-                                   'players': players,
-                                   'end_game': True})
             return HttpResponseRedirect(reverse('game', args=(game.id,)))
+        if 'play_last_card' in request.POST:
+            card_id = request.POST.get('play_last_card')
+            card = Card.objects.get(id=card_id)
+            player.play_card(card, cur_round)
+            game.end_round()
+            winners = game.end_game()
+            players = game.players.all().order_by('score')
+            players_done = players.filter(cur_card__isnull=True).count() == 0
+            return render(request, 'game.html',
+                            {'game': game,
+                            'game_id': game_id,
+                            'winners': winners,
+                            'players': players,
+                            'players_done': players_done,
+                            'end_game': True})
+
+class EndGame(View):
+    def get(request, game_id):
+        game = Game.objects.get(id=game_id)
+        game.end_round()
+        winners = game.end_game()
+        players = game.players.all().order_by('score')
+        players_done = players.filter(cur_card__isnull=True).count() == 0
+        return render(request, 'game.html',
+                        {'game': game,
+                        'game_id': game_id,
+                        'winners': winners,
+                        'players': players,
+                        'players_done': players_done,
+                        'end_game': True})
+    
 
 class SidebarUpdate(CurGame):
     def get(self, request, game_id):
@@ -177,10 +204,11 @@ class SidebarUpdate(CurGame):
             players = game.players.all().order_by('score')
             cur_round = game.cur_round
             if cur_round:
-                self.add_cur_rnd_to_context(game, context, cur_round, players, player)
-            self.add_game_play_data_to_context(game, context, players, player)
-            self.update_last_round_data(game, context, player)
-            if cur_round and cur_round.num == 1:
+                self.update_cur_round_data(game, context, cur_round, players, player)
+            
+            self.update_game_play_data(game, context, players, player)
+            
+            if 'last_round' in context and context['last_round']:
                 self.update_last_round_data(game, context, player)
             return render(request, 'blocks/sidebar.html', context)
 
@@ -193,10 +221,11 @@ class GamePlayUpdate(CurGame):
             players = game.players.all().order_by('score')
             cur_round = game.cur_round
             if cur_round:
-                self.add_cur_rnd_to_context(game, context, cur_round, players, player)
-            self.add_game_play_data_to_context(game, context, players, player)
-            self.update_last_round_data(game, context, player)
-            if cur_round and cur_round.num == 1:
+                self.update_cur_round_data(game, context, cur_round, players, player)
+                
+            self.update_game_play_data(game, context, players, player)
+            
+            if 'last_round' in context and context['last_round']:
                 self.update_last_round_data(game, context, player)
             return render(request, 'blocks/table.html', context)
 
@@ -205,11 +234,13 @@ class EndGameUpdate(CurGame):
         game = Game.objects.get(id=game_id)
         winners = game.end_game()
         players = game.players.all().order_by('score')
-        remaining_players = players.filter(cur_card__isnull=True)
-        if remaining_players.count() != 0:
-            return render(request, 'end_game.html',
-                            {'winners': winners,
-                            'players': players,
-                            'end_game': True})
-        else:
+        players_done = players.filter(cur_card__isnull=True).count() == 0
+        if players_done:
             return HttpResponseStopPolling()
+        return render(request, 'blocks/end_game.html',
+                        {'game': game,
+                        'game_id': game_id,
+                        'winners': winners,
+                        'players': players,
+                        'end_game': True,
+                        'players_done': players_done,})

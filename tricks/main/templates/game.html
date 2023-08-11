@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% block main %}
 {% if end_game %}
-    <div id="end_game" hx-get="{% url 'end_game' %}" hx-trigger="every 3s" hx-refresh="always">
-    {% include 'blocks/end_game.html' %}
+    <div id="waiting_to_end" hx-get="{% url 'waiting_to_end' game_id=game.id %}" hx-trigger="every 3s" hx-refresh="always">
+    {% include 'blocks/waiting_to_end.html' %}
     </div>
 {% else %}
 <div id="sidebar_update" hx-get="{% url 'sidebar_update' game_id=game.id %}" hx-trigger="every 3s" hx-refresh="always">

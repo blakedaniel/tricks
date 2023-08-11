@@ -273,7 +273,7 @@ class Game(models.Model):
         players = self.players.all()
         hand_cards_left = 0
         if self.cur_round.num == 1:
-            True
+            return True
         for player in players:
             hand_cards_left += player.hand.count()
             if hand_cards_left > 0:
@@ -290,7 +290,8 @@ class Game(models.Model):
     def end_round(self):
         cur_round = self.cur_round
         cur_round.calc_scores()
-        self.reset_bets_and_wins()
+        if cur_round.num != 1:
+            self.reset_bets_and_wins()
     
     def start_new_round(self):
         """_summary_
