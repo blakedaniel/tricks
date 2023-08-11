@@ -167,17 +167,9 @@ class PlayCard(View):
             card_id = request.POST.get('play_last_card')
             card = Card.objects.get(id=card_id)
             player.play_card(card, cur_round)
-            game.end_round()
-            winners = game.end_game()
-            players = game.players.all().order_by('score')
-            players_done = players.filter(cur_card__isnull=True).count() == 0
-            return render(request, 'game.html',
-                            {'game': game,
-                            'game_id': game_id,
-                            'winners': winners,
-                            'players': players,
-                            'players_done': players_done,
-                            'end_game': True})
+            return render(request, 'game.html', {'game': game,
+                                                 'game_id': game_id,
+                                                 'end_game': True,})
 
 class EndGame(View):
     def get(request, game_id):
@@ -186,7 +178,7 @@ class EndGame(View):
         winners = game.end_game()
         players = game.players.all().order_by('score')
         players_done = players.filter(cur_card__isnull=True).count() == 0
-        return render(request, 'game.html',
+        return render(request, 'end_game.html',
                         {'game': game,
                         'game_id': game_id,
                         'winners': winners,
@@ -236,8 +228,8 @@ class EndGameUpdate(CurGame):
         players = game.players.all().order_by('score')
         players_done = players.filter(cur_card__isnull=True).count() == 0
         if players_done:
-            return HttpResponseStopPolling()
-        return render(request, 'blocks/end_game.html',
+            return HttpResponseRedirect(reverse('end_game', args=(game.id,)))
+        return render(request, 'blocks/waiting_to_end.html',
                         {'game': game,
                         'game_id': game_id,
                         'winners': winners,
