@@ -13,7 +13,7 @@
             <li>{{ player }}: {{ player.score }}</li>
         {% endfor %}
     </ul>
-    <form action="">
-        <input type="submit" value="Play Again">
+    <form method="get" action="{% url 'create_game' %}">
+        <button type="submit">Play Again</button>
     </form>
 {% endblock main %}

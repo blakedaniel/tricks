@@ -20,7 +20,10 @@ from django.contrib.auth.views import LoginView, LogoutView
 # function based views
 from main.views import (home, register)
 # class based views
-from main.views import (CreateGame, JoinGame, CurGame, StartGame, Bet, PlayCard)
+from main.views import (CreateGame, JoinGame, CurGame,
+                        StartGame, Bet, PlayCard,
+                        SidebarUpdate, TableUpdate,
+                        HandUpdate, GamePlayUpdate)
 
 
 urlpatterns = [
@@ -39,12 +42,27 @@ urlpatterns += [path("", home, name="home"),
                 path("create_game/", CreateGame.as_view(), name="create_game"),
                 path("join_game/", JoinGame.as_view(), name="join_game"),]
 
-# game playe views
+# game play views
 urlpatterns += [path("game/<int:game_id>/", CurGame.as_view(), name="game"),
-                path("game/<int:game_id>/start_game", StartGame.as_view(), name="start_game"),
+                path("game/<int:game_id>/start_game", StartGame.as_view(),
+                     name="start_game"),
                 path("game/<int:game_id>/bet", Bet.as_view(), name="bet"),
-                path("game/<int:game_id>/play_card", PlayCard.as_view(), name="play_card")]
+                path("game/<int:game_id>/play_card", PlayCard.as_view(),
+                     name="play_card")]
 
-# htmx_patterns = [path("game/<int:game_id>/player_bets", check_bets, name="player_bets"),]
+# transition views
+urlpatterns += [path("game/<int:game_id>/next_trick", CurGame.as_view(),
+                     name="next_trick"),
+                path("game/<int:game_id>/next_round", CurGame.as_view(), 
+                     name="next_round"),]
 
-# urlpatterns += htmx_patterns
+htmx_patterns = [path("game/<int:game_id>/sidebar_update", SidebarUpdate.as_view(),
+                      name="sidebar_update"),
+                 path("game/<int:game_id>/table_update/", TableUpdate.as_view(),
+                      name="table_update"),
+                 path("game/<int:game_id>/hand_update", HandUpdate.as_view(),
+                      name="hand_update"),
+                 path("game/<int:game_id>/game_play_update", GamePlayUpdate.as_view(),
+                      name="game_play_update"),]
+
+urlpatterns += htmx_patterns

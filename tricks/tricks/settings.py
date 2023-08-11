@@ -51,7 +51,7 @@ INSTALLED_APPS = [
     "django_htmx",
     'debug_toolbar',
     # Local apps
-    "main"
+    "main.apps.MainConfig"
 ]
 
 MIDDLEWARE = [

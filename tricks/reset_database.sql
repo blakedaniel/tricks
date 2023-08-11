@@ -1,4 +1,9 @@
+DELETE FROM main_round_deck;
 DELETE FROM main_card;
-DELETE FROM main_player;
+DELETE FROM main_player_hand;
+DELETE FROM main_round_table;
+DELETE FROM main_game_players;
+DELETE FROM main_game_rounds;
 DELETE FROM main_round;
+DELETE FROM main_player;
 DELETE FROM main_game;
