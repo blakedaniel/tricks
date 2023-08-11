@@ -28,7 +28,7 @@ def register(request):
 class CreateGame(View, LoginRequiredMixin):
     def get(self, request):
         player = Player.objects.create(user=request.user)
-        game = Game.objects.create(num_of_rounds=3)
+        game = Game.objects.create(num_of_rounds=2)
         game.players.add(player)
         request.session['game_details'] = {'player_id': player.id,
                                            'game_id': game.id,}
@@ -41,8 +41,13 @@ class JoinGame(View, LoginRequiredMixin):
         game = Game.objects.get(id=game_id)
         if game.in_play:
             HttpResponse('Game in progress. Try another game.')
-        player = Player.objects.create(user=request.user,)
-        game.add_player(player)
+        players = game.players.all()
+        player_not_in_game =  players.filter(user=request.user).count() == 0
+        if player_not_in_game:
+            player = Player.objects.create(user=request.user,)
+            game.add_player(player)
+        else:
+            player = players.get(user=request.user)
         request.session['game_details'] = ({'player_id': player.id,
                                             'game_id': game_id,})
         return HttpResponseRedirect(reverse('game', args=(game.id,)))
