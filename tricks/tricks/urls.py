@@ -23,7 +23,7 @@ from main.views import (home, register)
 from main.views import (CreateGame, JoinGame, CurGame,
                         StartGame, Bet, PlayCard,
                         SidebarUpdate, GamePlayUpdate,
-                        EndGameUpdate)
+                        EndGameUpdate, EndGame)
 
 
 urlpatterns = [
@@ -60,9 +60,9 @@ htmx_patterns = [path("game/<int:game_id>/sidebar_update", SidebarUpdate.as_view
                       name="sidebar_update"),
                  path("game/<int:game_id>/game_play_update", GamePlayUpdate.as_view(),
                       name="game_play_update"),
-                 path("game/<int:game_id>/waitin_to_end", EndGameUpdate.as_view(),
+                 path("game/<int:game_id>/waiting_to_end", EndGameUpdate.as_view(),
                       name="waiting_to_end"),
-                 path("game/<int:game_id>/end_game", EndGameUpdate.as_view(),
+                 path("game/<int:game_id>/end_game", EndGame.as_view(),
                       name="end_game"),]
 
 urlpatterns += htmx_patterns

@@ -7,7 +7,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from django.contrib.auth.forms import UserCreationForm
 # from django_htmx libraries
-from django_htmx.http import HttpResponseStopPolling, HttpResponseClientRefresh
+from django_htmx.http import HttpResponseClientRedirect 
 # custom django imports
 from .models import Card, Player, Game
 
@@ -116,9 +116,6 @@ class CurGame(View, LoginRequiredMixin):
     
 class StartGame(View):
     def get(self, request, game_id):
-        # round 3: blake bets first
-        # round 2: admin bets first
-        #
         if request.user.is_authenticated:
             game = Game.objects.get(id=game_id)
         else:
@@ -173,9 +170,10 @@ class PlayCard(View):
 
 class EndGame(View):
     def get(request, game_id):
+        print('made it end of game request')
         game = Game.objects.get(id=game_id)
         game.end_round()
-        winners = game.end_game()
+        winners = game.get_winners()
         players = game.players.all().order_by('score')
         players_done = players.filter(cur_card__isnull=True).count() == 0
         return render(request, 'end_game.html',
@@ -224,15 +222,15 @@ class GamePlayUpdate(CurGame):
 class EndGameUpdate(CurGame):
     def get(self, request, game_id):
         game = Game.objects.get(id=game_id)
-        winners = game.end_game()
         players = game.players.all().order_by('score')
         players_done = players.filter(cur_card__isnull=True).count() == 0
         if players_done:
-            return HttpResponseRedirect(reverse('end_game', args=(game.id,)))
+            print('made it to redirect return')
+            # breakpoint()
+            return HttpResponseClientRedirect(reverse('end_game', args=(game.id,)))
         return render(request, 'blocks/waiting_to_end.html',
                         {'game': game,
                         'game_id': game_id,
-                        'winners': winners,
                         'players': players,
                         'end_game': True,
                         'players_done': players_done,})

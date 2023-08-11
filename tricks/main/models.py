@@ -224,8 +224,7 @@ class Game(models.Model):
     rounds = models.ManyToManyField(Round, blank=True, related_name='cur_rounds')
     bet_turn = models.IntegerField(default=0)
     created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
-    updated = models.DateTimeField(auto_now=True, blank=True, null=True)
-    
+    updated = models.DateTimeField(auto_now=True, blank=True, null=True)  
     @property
     def cur_round(self):
         rounds = self.rounds.all()
@@ -310,9 +309,8 @@ class Game(models.Model):
         self.rounds.add(cur_round)
         self.save()
         return cur_round
-    
-    # TODO: move to views        
-    def end_game(self):
+          
+    def get_winners(self):
         winners = []
         players = self.players.all().order_by('score')
         for player in players:
@@ -325,3 +323,7 @@ class Game(models.Model):
         for winner in winners:
             print(f'{winner} wins!')
         return winners
+    
+    def end_game(self):
+        self.finished = True
+        self.save()
