@@ -272,6 +272,8 @@ class Game(models.Model):
         """
         players = self.players.all()
         hand_cards_left = 0
+        if self.cur_round.num == 1:
+            True
         for player in players:
             hand_cards_left += player.hand.count()
             if hand_cards_left > 0:

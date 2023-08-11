@@ -159,7 +159,8 @@ class PlayCard(View):
                     players = game.players.all().order_by('score')
                     return render(request, 'end_game.html',
                                   {'winners': winners,
-                                   'players': players,})
+                                   'players': players,
+                                   'end_game': True})
             return HttpResponseRedirect(reverse('game', args=(game.id,)))
 
 class SidebarUpdate(CurGame):
@@ -178,7 +179,7 @@ class SidebarUpdate(CurGame):
                 self.update_last_round_data(game, context, player)
             return render(request, 'blocks/sidebar.html', context)
 
-class TableUpdate(CurGame):
+class GamePlayUpdate(CurGame):
     def get(self, request, game_id):
         game = Game.objects.get(id=game_id)
         context = request.session['game_details'].copy()
@@ -194,24 +195,16 @@ class TableUpdate(CurGame):
                 self.update_last_round_data(game, context, player)
             return render(request, 'blocks/table.html', context)
 
-class HandUpdate(CurGame):
+class EndGameUpdate(CurGame):
     def get(self, request, game_id):
         game = Game.objects.get(id=game_id)
-        context = request.session['game_details'].copy()
-        if request.htmx:
-            player = Player.objects.get(id=context['player_id'])
-            players = game.players.all().order_by('score')
-            cur_round = game.cur_round
-            if cur_round:
-                self.add_cur_rnd_to_context(game, context, cur_round, players, player)
-            self.add_game_play_data_to_context(game, context, players, player)
-            self.update_last_round_data(game, context, player)
-            if cur_round and cur_round.num == 1:
-                self.update_last_round_data(game, context, player)
-            if cur_round.num != 1:
-                return render(request, 'blocks/game_hand.html', context)
-            else:
-                return render(request, 'blocks/game_hand_last.html', context)
-            
-class GamePlayUpdate(CurGame):
-    pass
+        winners = game.end_game()
+        players = game.players.all().order_by('score')
+        remaining_players = players.filter(cur_card__isnull=True)
+        if remaining_players.count() != 0:
+            return render(request, 'end_game.html',
+                            {'winners': winners,
+                            'players': players,
+                            'end_game': True})
+        else:
+            return HttpResponseStopPolling()

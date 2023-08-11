@@ -1,6 +1,19 @@
-<h3>Table</h3>
-<ul>
-    {% for player in playing_order %}
-    <li>{{player}}: {{player.cur_card}}</li>
-    {% endfor %}
-</ul>
+<div class="table-item">
+    <h3>Table</h3>
+    <ul>
+        {% for player in playing_order %}
+        <li>{{player}}: {{player.cur_card}}</li>
+        {% endfor %}
+    </ul>
+</div>
+<div class="table-item">
+    <div class="cards">
+        <div class="cards-item">
+            {% if cur_round.num != 1 %}
+            {% include 'blocks/game_hand.html' %}
+            {% else %}
+            {% include 'blocks/game_hand_last.html' %}
+            {% endif %}
+        </div>
+    </div>
+</div>

@@ -22,8 +22,8 @@ from main.views import (home, register)
 # class based views
 from main.views import (CreateGame, JoinGame, CurGame,
                         StartGame, Bet, PlayCard,
-                        SidebarUpdate, TableUpdate,
-                        HandUpdate, GamePlayUpdate)
+                        SidebarUpdate, GamePlayUpdate,
+                        EndGameUpdate)
 
 
 urlpatterns = [
@@ -58,11 +58,9 @@ urlpatterns += [path("game/<int:game_id>/next_trick", CurGame.as_view(),
 
 htmx_patterns = [path("game/<int:game_id>/sidebar_update", SidebarUpdate.as_view(),
                       name="sidebar_update"),
-                 path("game/<int:game_id>/table_update/", TableUpdate.as_view(),
-                      name="table_update"),
-                 path("game/<int:game_id>/hand_update", HandUpdate.as_view(),
-                      name="hand_update"),
                  path("game/<int:game_id>/game_play_update", GamePlayUpdate.as_view(),
-                      name="game_play_update"),]
+                      name="game_play_update"),
+                 path("game/<int:game_id>/end_game", EndGameUpdate.as_view(),
+                      name="end_game"),]
 
 urlpatterns += htmx_patterns

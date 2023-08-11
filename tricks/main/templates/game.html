@@ -1,23 +1,16 @@
 {% extends 'base.html' %}
 {% block main %}
+{% if end_game %}
+    <div id="end_game" hx-get="{% url 'end_game' %}" hx-trigger="every 3s" hx-refresh="always">
+    {% include 'blocks/end_game.html' %}
+    </div>
+{% else %}
 <div id="sidebar_update" hx-get="{% url 'sidebar_update' game_id=game.id %}" hx-trigger="every 3s" hx-refresh="always">
     {% include 'blocks/sidebar.html' %}
 </div>
-<div class="table">
-    <div id="table" class="table-item" hx-get="{% url 'table_update' game_id=game.id %}" hx-trigger"every 3s" hx-refresh="always">
-        {% include 'blocks/table.html' %}
-    </div>
-    <div class="table-item">
-        <div class="cards">
-            <div id="hand_update" class="cards-item" hx-get="{% url 'hand_update' game_id=game.id %}" hx-trigger="every 3s" hx-refresh="always">
-                {% if cur_round.num != 1 %}
-                {% include 'blocks/game_hand.html' %}
-                {% else %}
-                {% include 'blocks/game_hand_last.html' %}
-                {% endif %}
-            </div>
-        </div>
-    </div>
+<div id="game_play_update" class="table" hx-get="{% url 'game_play_update' game_id=game.id %}" hx-trigger="every 3s" hx-refresh="always">
+    {% include 'blocks/table.html'%}
 </div>
+{% endif %}
 {% endblock main %}
 
