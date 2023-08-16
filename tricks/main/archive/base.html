@@ -1,0 +1,17 @@
+{% load django_htmx %}
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include 'blocks/head.html' %}
+</head>
+<body class="bg-primary" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+    <header class="container">
+        <h1>Tricks</h1>
+        {% include 'blocks/menu.html' %}
+    </header>
+    <main class="container">
+        {% block main %}{% endblock %}
+    </main>
+</body>
+</html>

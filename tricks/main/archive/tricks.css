@@ -1,0 +1,81 @@
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+main {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+header {
+    display: flex;
+    justify-content: flex-start;
+    align-items: first baseline;
+}
+
+/* sidebar */
+nav ul {
+    display: flex;
+    justify-content: space-between;
+    list-style-type: none;
+    flex-wrap: wrap;
+    width: 100%;                                                                                                                                   
+    align-items: center;
+}
+
+div.sidebar ul {
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    padding-left: 0;
+}
+
+div.sidebar ul.bet_buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+/* cards */
+img.cards {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    width: 50%;
+    height: auto;
+}
+
+.cards-item ul, .table-item ul {
+    display: flex;
+    list-style: none;
+    justify-content: space-evenly;
+}
+
+#trump {
+    display: flex;
+    justify-content: center;
+}
+
+button.card_button {
+    background-color: transparent;
+    border: none;
+}
+
+img.hand {
+    width: 70%;
+}
+
+ul.cur_cards {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    width:100%;
+}
+
+ul.cur_cards li {
+    width: 20%;
+}

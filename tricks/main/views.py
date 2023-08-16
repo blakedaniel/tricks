@@ -7,7 +7,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from django.contrib.auth.forms import UserCreationForm
 # from django_htmx libraries
-from django_htmx.http import HttpResponseClientRedirect 
+from django_htmx.http import HttpResponseClientRedirect, HttpResponseStopPolling 
 # custom django imports
 from .models import Card, Player, Game
 
@@ -22,13 +22,12 @@ def register(request):
             return redirect('home')
     else:
         form = UserCreationForm()
-    return render(request, 'registration/register.html', {'form': form})
-
+    return render(request, 'theme/registration/register.html', {'form': form})
 
 class CreateGame(View, LoginRequiredMixin):
     def get(self, request):
         player = Player.objects.create(user=request.user)
-        game = Game.objects.create(num_of_rounds=1)
+        game = Game.objects.create(num_of_rounds=7)
         game.players.add(player)
         request.session['game_details'] = {'player_id': player.id,
                                            'game_id': game.id,}
@@ -60,7 +59,6 @@ class CurGame(View, LoginRequiredMixin):
             bet_range = player.bet_range(cur_round)
             card_play_ready = cur_round.players.filter(bet__isnull=True).count() == 0
             playable_cards = player.playable_cards(cur_round)
-            last_round = game.rounds.last().num == 1
             context.update({
                 'cur_round': cur_round,
                 'playing_order': play_order,
@@ -72,19 +70,19 @@ class CurGame(View, LoginRequiredMixin):
                 'table': cur_round.table.all(),
                 'card_play_ready': card_play_ready,
                 'playable_cards': playable_cards,
-                'last_round': last_round,
                 })
             
     def update_game_play_data(self, game, context, players, player):
         bet_order = game.players.order_by('bet_pos')
         remaining_betting_players = game.players.filter(bet__isnull=True).order_by('bet_pos')
         betting_player = remaining_betting_players.first()
+        hand = player.hand.all().order_by('suit', 'rank')
         context.update({'game': game,
                         'players': players,
                         'player': player,
                         'betting_order': bet_order,
                         'betting_player': betting_player,
-                        'hand': player.hand.all().order_by('suit', 'rank'),
+                        'hand': hand,
                         'bet': player.bet,
                         'wins': player.wins,
                         'score': player.score,})
@@ -92,7 +90,9 @@ class CurGame(View, LoginRequiredMixin):
     def update_last_round_data(self, game, context, player):
             other_players = game.players.exclude(id=player.id)
             others_cards = [player.hand.first() for player in other_players]
+            others_cards = self.get_card_image(others_cards)
             last_card = player.hand.last()
+            last_card = self.get_card_image(last_card)
             context.update({'others_cards': others_cards,
                             'last_card': last_card,})
     
@@ -110,9 +110,11 @@ class CurGame(View, LoginRequiredMixin):
         
         self.update_game_play_data(game, context, players, player)
         
-        if 'last_round' in context and context['last_round']:
+        last_round = cur_round and cur_round.num == 1
+        if last_round:
             self.update_last_round_data(game, context, player)
-        return render(request, 'game.html', context)
+
+        return render(request, 'theme/game.html', context)
     
 class StartGame(View):
     def get(self, request, game_id):
@@ -155,6 +157,7 @@ class PlayCard(View):
             card = Card.objects.get(id=card_id)
             player.play_card(card, cur_round)
             if cur_round.check_trick_complete():
+                cur_round.end_trick()
                 cur_round.start_new_trick()
                 if cur_round.num != 1 and game.check_round_complete():
                     game.end_round()
@@ -164,32 +167,14 @@ class PlayCard(View):
             card_id = request.POST.get('play_last_card')
             card = Card.objects.get(id=card_id)
             player.play_card(card, cur_round)
-            return render(request, 'game.html', {'game': game,
-                                                 'game_id': game_id,
-                                                 'end_game': True,})
-
-class EndGame(View):
-    def get(request, game_id):
-        print('made it end of game request')
-        game = Game.objects.get(id=game_id)
-        game.end_round()
-        winners = game.get_winners()
-        players = game.players.all().order_by('score')
-        players_done = players.filter(cur_card__isnull=True).count() == 0
-        return render(request, 'end_game.html',
-                        {'game': game,
-                        'game_id': game_id,
-                        'winners': winners,
-                        'players': players,
-                        'players_done': players_done,
-                        'end_game': True})
+            return HttpResponseRedirect(reverse('game', args=(game.id,)))
     
-
 class SidebarUpdate(CurGame):
     def get(self, request, game_id):
         game = Game.objects.get(id=game_id)
         context = request.session['game_details'].copy()
         if request.htmx:
+            status = 200
             player = Player.objects.get(id=context['player_id'])
             players = game.players.all().order_by('score')
             cur_round = game.cur_round
@@ -200,9 +185,23 @@ class SidebarUpdate(CurGame):
             
             if 'last_round' in context and context['last_round']:
                 self.update_last_round_data(game, context, player)
-            return render(request, 'blocks/sidebar.html', context)
+                if game.finished:
+                    status = 286
+            # breakpoint()
+            return render(request, 'blocks/sidebar.html', context, status=status)
 
 class GamePlayUpdate(CurGame):
+    def end_game(self, game, context):
+        cur_round = game.cur_round
+        if not game.finished:
+            cur_round.end_trick()
+            game.end_round()
+            game.end_game()
+        winners = game.get_winners()
+        players = game.players.all().order_by('score')
+        context.update({'players': players,
+                        'winners': winners,})
+    
     def get(self, request, game_id):
         game = Game.objects.get(id=game_id)
         context = request.session['game_details'].copy()
@@ -215,22 +214,11 @@ class GamePlayUpdate(CurGame):
                 
             self.update_game_play_data(game, context, players, player)
             
-            if 'last_round' in context and context['last_round']:
+            if cur_round and cur_round.num == 1:
                 self.update_last_round_data(game, context, player)
-            return render(request, 'blocks/table.html', context)
-
-class EndGameUpdate(CurGame):
-    def get(self, request, game_id):
-        game = Game.objects.get(id=game_id)
-        players = game.players.all().order_by('score')
-        players_done = players.filter(cur_card__isnull=True).count() == 0
-        if players_done:
-            print('made it to redirect return')
+                if cur_round.check_trick_complete():
+                    self.end_game(game, context)
+                    return render(request, 'blocks/table_game_finished.html',
+                                  context, status=286)
             # breakpoint()
-            return HttpResponseClientRedirect(reverse('end_game', args=(game.id,)))
-        return render(request, 'blocks/waiting_to_end.html',
-                        {'game': game,
-                        'game_id': game_id,
-                        'players': players,
-                        'end_game': True,
-                        'players_done': players_done,})
+            return render(request, 'blocks/table.html', context)

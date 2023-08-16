@@ -1,0 +1,35 @@
+body {
+    display: flex;
+    flex-direction: column;
+    margin: 2em;
+    justify-content: flex-start;
+}
+
+main {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+header {
+    display: flex;
+    justify-content: flex-start;
+    align-items: first baseline;
+}
+nav ul {
+    display: flex;
+    justify-content: space-evenly;
+    list-style-type: none;
+    flex-wrap: wrap;
+    width: 100%;                                                                                                                                   
+    align-items: center;
+}
+
+img.cards {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    width: 40%;
+    height: auto;
+}

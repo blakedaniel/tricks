@@ -30,11 +30,15 @@ class Card(models.Model):
     suit = models.CharField(max_length=10, choices=SUIT_CHOICES)
     rank = models.CharField(max_length=5, choices=RANK_CHOICES)
     
+    @property
+    def image(self):
+        return f'{self.rank}_of_{self.suit}.png'
+    
     def __str__(self):
         return f"{self.rank} of {self.suit}"
     
     def __repr__(self):
-        return f"{self.rank} of {self.suit}"
+        return f"{self.rank}_of_{self.suit}"
     
     def is_better(self, winning_card, trump_suit):
         if self.suit == winning_card.suit:
@@ -155,14 +159,16 @@ class Round(models.Model):
         self.deck.set(deck, clear=True)
         self.save()
     
-    def start_new_trick(self):
-        # assumes trick is complete
+    def end_trick(self):
         winner = self.get_trick_winner()
         winner.update_wins()
+        self.update_play_order(winner)
+    
+    def start_new_trick(self):
+        # assumes trick is complete
         self.reset_cur_cards()
         self.reset_table()
         self.reset_trick()
-        self.update_play_order(winner)
     
     def reset_cur_cards(self):
         players = self.players.all()
@@ -211,11 +217,6 @@ class Round(models.Model):
                 winner = player
                 winning_card = player.cur_card
         return winner
-        
-    def calc_scores(self):
-        players = self.players
-        for player in players:
-            player.calc_score()
 
 # TODO: delete bet_turn field, managing bet_trun in views            
 class Game(models.Model):
@@ -224,7 +225,8 @@ class Game(models.Model):
     rounds = models.ManyToManyField(Round, blank=True, related_name='cur_rounds')
     bet_turn = models.IntegerField(default=0)
     created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
-    updated = models.DateTimeField(auto_now=True, blank=True, null=True)  
+    updated = models.DateTimeField(auto_now=True, blank=True, null=True)
+    finished = models.BooleanField(default=False)
     @property
     def cur_round(self):
         rounds = self.rounds.all()
@@ -288,7 +290,9 @@ class Game(models.Model):
 
     def end_round(self):
         cur_round = self.cur_round
-        cur_round.calc_scores()
+        players = self.players.all()
+        for player in players:
+            player.calc_score()
         if cur_round.num != 1:
             self.reset_bets_and_wins()
     
