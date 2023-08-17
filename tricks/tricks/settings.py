@@ -18,7 +18,7 @@ INTERNAL_IPS = ['127.0.0.1',
                 '::1',]
 
 CSRF_TRUSTED_ORIGINS =['http://localhost*',
-                       'tricks.fly.dev',]
+                       'https://tricks.fly.dev',]
 
 # Application definition
 
@@ -76,9 +76,12 @@ WSGI_APPLICATION = "tricks.wsgi.application"
 
 DATABASES = {
     'default': dj_database_url.config(
-        default='postgresql://admin:asdf1234@0.0.0.0:5433/tricks',
+        default='postgres://tricks:XhWmbz4nRUcHzqr@tricks-db.flycast:5432/tricks?sslmode=disable',
         conn_max_age=600,
         conn_health_checks=True,
+    ),
+    'dev': dj_database_url.config(
+        default='postgresql://admin:asdf1234@0.0.0.0:5433/tricks',
     )
 }
 

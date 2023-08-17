@@ -1,6 +1,6 @@
 <nav class="w-full font-mono font-medium my-4">
     {% if user.is_authenticated %}
-    <ul class="flex justify-around items-center divide-x-2 divide-gray-900 divide-dashed">
+    <ul class="flex justify-around items-center divide-x-2 divide-gray-900 divide-dashed flex-wrap">
         <li class="flex px-1">
             <h2 class="font-semibold">{{ user.username }}</h2>
         </li>
@@ -32,7 +32,7 @@
     {% else %}
     <form method="post" action="{% url 'login' %}">
         {% csrf_token %}
-        <ul class="flex justify-evenly items-center">
+        <ul class="flex justify-evenly items-center flex-wrap">
             <li><input type="text" name="username" placeholder="Username"></li>
             <li><input type="password" name="password" placeholder="Password"></li>
             <li><button type="submit">Login</button></li>
