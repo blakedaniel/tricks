@@ -1,0 +1,46 @@
+# establish two docker services, one for python 3.10-alpine,and one for postgres 13-alpine
+version: '3.9'
+services:
+  web:
+    # platform: linux/amd64
+    build:
+      context: .
+      # network: host
+    volumes:
+      - .:/code
+    ports:
+      - 8000:8000
+    environment:
+      SECRET_KEY: dfb009c0be19574fc76d3e8193ad22e67ee43a63bedd039f
+      DATABASE_URL: postgres://tricks:XhWmbz4nRUcHzqr@tricks-db.flycast:5432/tricks?sslmode=disable
+    stdin_open: true
+    tty: true
+    networks:
+      - tricks_net
+    depends_on:
+      - db
+  db:
+    # platform: linux/amd64
+    image: postgres:14.7
+    environment:
+      POSTGRES_PASSWORD: FHbBJXvDfFOKZ9j
+      POSTGRES_USER: postgres
+      POSTGRES_DB: tricks-db.internal
+    ports:
+      - 5433:5432
+    restart: always
+    networks:
+      - tricks_net
+    volumes:
+      - tricks_vol:/var/lib/postgresql/data
+  tailwind:
+    command: "python manage.py tailwind start"
+    tty: true
+    depends_on:
+      - web
+
+volumes:
+  tricks_vol:
+
+networks:
+  tricks_net:

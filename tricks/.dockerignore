@@ -1,0 +1,6 @@
+fly.toml
+.git/
+*.sqlite3
+
+# postgres files
+postgres_creds.md
