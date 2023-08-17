@@ -218,7 +218,6 @@ class Round(models.Model):
                 winning_card = player.cur_card
         return winner
 
-# TODO: delete bet_turn field, managing bet_trun in views            
 class Game(models.Model):
     players = models.ManyToManyField(Player, blank=True)
     num_of_rounds = models.IntegerField(default=7)

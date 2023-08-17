@@ -10,6 +10,8 @@ from django.contrib.auth.forms import UserCreationForm
 from django_htmx.http import HttpResponseClientRedirect, HttpResponseStopPolling 
 # custom django imports
 from .models import Card, Player, Game
+# python libraries
+import time
 
 def home(request):
     return render(request, 'home.html')
@@ -22,7 +24,7 @@ def register(request):
             return redirect('home')
     else:
         form = UserCreationForm()
-    return render(request, 'theme/registration/register.html', {'form': form})
+    return render(request, 'registration/register.html', {'form': form})
 
 class CreateGame(View, LoginRequiredMixin):
     def get(self, request):
@@ -90,9 +92,7 @@ class CurGame(View, LoginRequiredMixin):
     def update_last_round_data(self, game, context, player):
             other_players = game.players.exclude(id=player.id)
             others_cards = [player.hand.first() for player in other_players]
-            others_cards = self.get_card_image(others_cards)
             last_card = player.hand.last()
-            last_card = self.get_card_image(last_card)
             context.update({'others_cards': others_cards,
                             'last_card': last_card,})
     
@@ -114,7 +114,7 @@ class CurGame(View, LoginRequiredMixin):
         if last_round:
             self.update_last_round_data(game, context, player)
 
-        return render(request, 'theme/game.html', context)
+        return render(request, 'game.html', context)
     
 class StartGame(View):
     def get(self, request, game_id):
@@ -158,6 +158,7 @@ class PlayCard(View):
             player.play_card(card, cur_round)
             if cur_round.check_trick_complete():
                 cur_round.end_trick()
+                time.sleep(3)
                 cur_round.start_new_trick()
                 if cur_round.num != 1 and game.check_round_complete():
                     game.end_round()
@@ -187,7 +188,6 @@ class SidebarUpdate(CurGame):
                 self.update_last_round_data(game, context, player)
                 if game.finished:
                     status = 286
-            # breakpoint()
             return render(request, 'blocks/sidebar.html', context, status=status)
 
 class GamePlayUpdate(CurGame):
@@ -195,6 +195,7 @@ class GamePlayUpdate(CurGame):
         cur_round = game.cur_round
         if not game.finished:
             cur_round.end_trick()
+            time.sleep(3)
             game.end_round()
             game.end_game()
         winners = game.get_winners()
@@ -220,5 +221,4 @@ class GamePlayUpdate(CurGame):
                     self.end_game(game, context)
                     return render(request, 'blocks/table_game_finished.html',
                                   context, status=286)
-            # breakpoint()
             return render(request, 'blocks/table.html', context)

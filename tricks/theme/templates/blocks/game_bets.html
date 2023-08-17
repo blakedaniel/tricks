@@ -1,8 +1,10 @@
-<ul class="bet_buttons">
-    {% for bet in bet_range %}
-    <form method="post" action="{% url 'bet' game_id=game.id %}">
-    {% csrf_token %}
-        <li><input type="submit" name="bet" hx-boost="true" value="{{ bet }}"></li>
-    </form>
-    {% endfor %}
-</ul>
+<div class="container flex flex-col w-2/3">
+    <ul class="flex justify-center">
+        {% for bet in bet_range %}
+        <form class="bg-gray-100 text-red-700 font-bold text-sm rounded-full p-1 mx-2 transition-colors duration-300 ease-in-out hover:bg-red-700 hover:text-gray-50" method="post" action="{% url 'bet' game_id=game.id %}">
+        {% csrf_token %}
+            <li><input type="submit" name="bet" hx-boost="true" value="{{ bet }}"></li>
+        </form>
+        {% endfor %}
+    </ul>
+</div>

@@ -1,10 +1,12 @@
-{% extends 'theme.base.html' %}
+{% extends 'base.html' %}
 {% block main %}
-<div id="sidebar_update" hx-get="{% url 'sidebar_update' game_id=game.id %}" hx-trigger="every 3s" hx-refresh="always">
-    {% include 'blocks/sidebar.html' %}
-</div>
-<div id="game_play_update" class="table" hx-get="{% url 'game_play_update' game_id=game.id %}" hx-trigger="every 3s" hx-refresh="always">
-    {% include 'blocks/table.html'%}
+<div class="container flex w-full font-mono">
+    <div id="sidebar_update" class="w-1/6 mx-4" hx-get="{% url 'sidebar_update' game_id=game.id %}" hx-trigger="every 3s" hx-refresh="always">
+        {% include 'blocks/sidebar.html' %}
+    </div>
+    <div id="game_play_update" class="h-screen w-5/6" hx-get="{% url 'game_play_update' game_id=game.id %}" hx-trigger="every 3s" hx-refresh="always">
+        {% include 'blocks/table.html'%}
+    </div>
 </div>
 {% endblock main %}
 

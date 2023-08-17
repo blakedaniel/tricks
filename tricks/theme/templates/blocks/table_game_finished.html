@@ -1,21 +1,23 @@
-<div class="table-item">
-    <h3>Winners</h3>
-    <ul>
-        {% for player in winners %}
-        <li>{{player}}: {{player.score}}</li>
-        {% endfor %}
-    </ul>
-</div>
-<div class="table-item">
-    <h3>Scores</h3>
-    <ul>
-        {% for player in players %}
-        <li>{{player}}: {{player.score}}</li>
-        {% endfor %}
-    </ul>
-</div>
-<div class="table-item">
-    <form method="get" action="{% url 'create_game' %}">
-        <button type="submit">Play Again</button>
-    </form>
+<div class="flex flex-row justify-center w-2/3">
+    <div class="flex flex-col bg-green-900 text-gray-100 rounded border border-gray-100 px-12 py-4">
+        <div class="my-2">
+            <h3 class="text-xl font-semibold">Winners</h3>
+            <ul>
+                {% for player in winners %}
+                <li>{{player}}: {{player.score}}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="my-2">
+            <h3 class="text-xl font-semibold">Scores</h3>
+            <ul>
+                {% for player in players %}
+                <li>{{player}}: {{player.score}}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <form method="get" action="{% url 'create_game' %}">
+            <button class="bg-gray-100 text-red-700 font-bold text-sm rounded-full p-2 mt-1 transition-colors duration-300 ease-in-out hover:bg-red-700 hover:text-gray-50" type="submit">Play Again</button>
+        </form>
+    </div>
 </div>
