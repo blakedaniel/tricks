@@ -6,3 +6,10 @@
 
 # postgres files
 postgres_creds.md
+
+# django files
+*settings.py
+
+# flyio files
+*docker-compose-flyio.yml
+*fly.toml
