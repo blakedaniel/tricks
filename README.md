@@ -1,9 +1,18 @@
 # Tricks
-
 Tricks is a trick-based card game where players try to bet on the number of 'tricks' they will win in a round. A trick is a 'sub-round' of play where each player plays a card. The player who plays the highest card wins the trick. The game is played over a series of rounds, with the first round consists of 7 cards, and every subsequent round the cards dealt decreases by one. The final round is played with one card, and players see other players cards, but not their own make bets based off of this information. Players get points if the bet they set at the start of each round equals the number of tricks they won in that round. The player with the most points at the end of the game wins.
 
-## See Demo
+## Stack
+- [Python](https://www.python.org/)
+- [Django](https://www.djangoproject.com/)
+- [HTMX](https://htmx.org/)
+- [TailwindCSS](https://tailwindcss.com/)
+- [Docker](https://www.docker.com/)
+
+## Live Demo
 Check out the demo [here](https://tricks.fly.dev).
+
+## Video Demo
+![]()
 
 ## run locally
 ### Requirements
