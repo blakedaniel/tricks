@@ -12,7 +12,7 @@ Tricks is a trick-based card game where players try to bet on the number of 'tri
 Check out the demo [here](https://tricks.fly.dev).
 
 ## Video Demo
-![](https://github.com/blakedaniel/tricks/blob/main/tricks-demo.mov)
+![](tricks-demo.mov)
 
 ## run locally
 ### Requirements
